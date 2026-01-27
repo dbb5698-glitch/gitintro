@@ -84,7 +84,8 @@ print(f"Armor: {armor}")
 def get_player_intelligence(data):
     """Return the player's intelligence stat."""
     # YOUR CODE HERE
-    pass
+    return data["player"]["stats"]["intelligence"]
+    
 
 
 # TODO Task 2: Get the total number of health potions
@@ -92,7 +93,8 @@ def get_player_intelligence(data):
 def get_health_potion_count(data):
     """Return the quantity of health potions in inventory."""
     # YOUR CODE HERE
-    pass
+    return data["inventory"]["potions"][0]["quantity"]
+    
 
 
 # TODO Task 3: Get a list of all active quest titles
@@ -100,7 +102,8 @@ def get_health_potion_count(data):
 def get_active_quest_titles(data):
     """Return a list of titles from active quests."""
     # YOUR CODE HERE
-    pass
+    return [quest["title"] for quest in data["quests"]["active"]]
+    
 
 
 # TODO Task 4: Calculate total damage from all weapons
@@ -108,7 +111,8 @@ def get_active_quest_titles(data):
 def calculate_total_weapon_damage(data):
     """Return the sum of damage from all weapons."""
     # YOUR CODE HERE
-    pass
+    return sum(weapon["damage"] for weapon in data["inventory"]["weapons"])
+    
 
 
 # TODO Task 5: Add a new potion to the inventory
@@ -116,7 +120,8 @@ def calculate_total_weapon_damage(data):
 def add_potion(data, potion):
     """Add a new potion dictionary to the inventory's potions list."""
     # YOUR CODE HERE
-    pass
+    return data["inventory"]["potions"].append(potion)
+    
 
 
 # TODO Task 6: Update the player's gold after completing a quest
@@ -127,7 +132,11 @@ def complete_quest_and_get_reward(data, quest_id):
     and return the new gold total.
     """
     # YOUR CODE HERE
-    pass
+    for quest in data["quests"]["active"]:
+        if quest["id"] == quest_id:
+            data["inventory"]["gold"] += quest["reward"]
+            return data["inventory"]["gold"]
+
 
 
 # ============================================================================
@@ -149,7 +158,8 @@ print(f"\nParsed back - Player name: {parsed_data['player']['name']}")
 def to_pretty_json(data):
     """Convert a dictionary to a pretty-printed JSON string with 4-space indent."""
     # YOUR CODE HERE
-    pass
+    return json.dumps(data, indent=4)  
+    
 
 
 # ============================================================================
