@@ -6,10 +6,14 @@ from ollama import chat
 from util.llm_utils import pretty_stringify_chat, ollama_seed as seed
 
 # Add you code below
-sign_your_name = 'Pulin Agrawal'
+sign_your_name = 'Dal Basnet'
 model = 'gemma3:270m'
-options = {}
-messages = []
+options = {'temperature': 0.7, 'max_tokens': 250}
+messages = [{'role':'system', 'content': 'You are a Dungeons and Dragons (DND) game master (GM). '
+                                 'You will guide the user through an engaging and immersive DND adventure. '
+                                 'Create vivid descriptions of environments, characters, and events. '}
+                                 ]
+
 
 
 # But before here.
@@ -18,10 +22,15 @@ messages.append({'role':'user', 'content':''}) # An empty user message to prompt
 options |= {'seed': seed(sign_your_name)}
 # Chat loop
 while True:
+
   response = chat(model=model, messages=messages, stream=False, options=options)
   # Add your code below
-
-
+  print(f'Dungeon Master: {response.message.content}')
+  messages.append({'role': 'assistant', 'content': response.message.content})
+  message = {'role': 'user', 'content': input('You: ')}
+  messages.append(message)
+  
+ 
   # But before here.
   if messages[-1]['content'] == '/exit':
     break
