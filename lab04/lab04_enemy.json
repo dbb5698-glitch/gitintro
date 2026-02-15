@@ -1,8 +1,8 @@
 {
-  "model": "gemma3",
+  "model": "llama3.2:latest",
   "options": {
     "temperature": 0,
-    "seed" :"Pulin Agrawal",
+    "seed" :"Dal Basnet",
     "max_tokens": 100
   },
   "messages": [
