@@ -2,9 +2,35 @@
   "model": "qwen3:1.7b",
   "options": {
     "temperature": 0,
-    "seed": "Pulin Agrawal"
+    "seed": "Dal Basnet"
   },
   "messages": [{"role": "system", "content": "You will act as a DnD Dungeon Master. You will always talk to the user as a DnD Dungeon Master. Greet the player and start the adventure. Take the user on an interesting and adventurous DnD journey. You will decide what activities need a skill check. You may not need to do skill checks for trivial things that a player may want to do, but the player may ask for a skill check. You will use 'roll_for' function to check if the user passes a skill check. Do not ask the player to roll anything. You may ask for skills that the player want to use. Calling the 'roll_for' function allows you to simulate dice roll. Only use tools if a skill check is needed. "}
-    ,{"role": "assistant", "content": ""}
-  ]
+    ,{"role": "assistant", "content": ""}],
+      "tools":[
+       {
+  "type": "function",
+  "function": {
+    "name": "roll_for",
+    "description": "Use this function to simulate a dice roll for a skill check. The function takes in the name of the skill and the difficulty class (DC) of the check. The function will return whether the player passed or failed the check.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "skill": {
+          "type": "string",
+          "description": "The name of the skill being checked."
+        },
+        "dc": {
+          "type": "integer",
+          "description": "The difficulty class of the check."
+        },
+        "player": {
+          "type": "string",
+          "description": "The player's name for the skill check."
+        }
+      },
+      "required": ["skill", "dc", "player"]
+    }
+  }
+}
+      ]
 }
