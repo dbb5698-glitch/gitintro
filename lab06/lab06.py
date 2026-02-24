@@ -61,6 +61,15 @@ class Encounter(BaseModel):
 # ============================================================================
 
 def generate_character(description: str) -> CharacterSheet:
+    response = ollama.chat(
+        model=MODEL, 
+        messages=[
+            {"role": "user", "content": description},
+        ],
+        format=CharacterSheet.model_json_schema(),
+        )
+    character = CharacterSheet.model_validate_json(response["message"]["content"])
+    return character
     """
     Generate a D&D character sheet from a natural language description.
 
@@ -86,10 +95,19 @@ def generate_character(description: str) -> CharacterSheet:
     Returns:
         A validated CharacterSheet instance
     """
-    pass
+
 
 
 def generate_monster(concept: str) -> MonsterStats:
+    response = ollama.chat(
+        model=MODEL, 
+        messages=[
+            {"role": "user", "content": concept},
+        ],
+        format=MonsterStats.model_json_schema(),
+    )   
+    monster = MonsterStats.model_validate_json(response["message"]["content"])
+    return monster
     """
     Generate D&D monster stats from a concept description.
 
@@ -103,10 +121,20 @@ def generate_monster(concept: str) -> MonsterStats:
     Returns:
         A validated MonsterStats instance
     """
-    pass
+    
+
 
 
 def generate_encounter(party_level: int, num_monsters: int, theme: str) -> Encounter:
+    response = ollama.chat(
+        model=MODEL, 
+        messages=[
+            {"role": "user", "content": f"Create an encounter for a party of level {party_level} with {num_monsters} monsters, following the theme: {theme}."},
+        ],
+        format=Encounter.model_json_schema(),
+    )
+    encounter = Encounter.model_validate_json(response["message"]["content"])
+    return encounter
     """
     Generate a complete D&D encounter with nested structured output.
 
@@ -128,7 +156,7 @@ def generate_encounter(party_level: int, num_monsters: int, theme: str) -> Encou
     Returns:
         A validated Encounter instance
     """
-    pass
+
 
 
 # ============================================================================
