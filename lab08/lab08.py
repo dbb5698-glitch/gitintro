@@ -11,17 +11,18 @@ from typing import List, Dict, Any
 
 # Vector database, embedding, and text processing
 import chromadb
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 import ollama
+from ollama import embed
 import numpy as np
 
 # Utility imports
 import pandas as pd
 
 
-class OllamaEmbeddingFunction:
+class OllamaEmbeddingFunction(chromadb.EmbeddingFunction):
     """
     Custom embedding function that uses Ollama for embeddings.
     
@@ -30,6 +31,7 @@ class OllamaEmbeddingFunction:
     Outputs:
         Callable that takes a list of strings and returns a list of embedding vectors (List[List[float]]).
     """
+
     
     def __init__(self, model_name="nomic-embed-text"):
         self.model_name = model_name
@@ -43,7 +45,12 @@ class OllamaEmbeddingFunction:
         Outputs:
             List[List[float]]: List of embedding vectors, one per input string.
         """
-        pass
+        # Generate embeddings using Ollama
+        response = embed(
+            model=self.model_name,
+            input=input,
+        )
+        return response['embeddings']
 
 
 def load_documents(data_dir: str) -> Dict[str, str]:
@@ -156,7 +163,15 @@ def retrieve_context(collection: chromadb.Collection, query: str, n_results: int
     Outputs:
         List[str]: List of retrieved context strings relevant to the query.
     """
-    pass
+        
+    results = collection.query(
+        query_embeddings = embed(model='nomic-embed-text', input=[query])['embeddings'],
+        query_texts=[query],
+        n_results=n_results
+    )
+    return results
+   
+    
 
 
 
