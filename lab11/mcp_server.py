@@ -63,7 +63,10 @@ def roll_dice(n_dice: int, sides: int, modifier: int = 0) -> str:
     - Return a message like "Rolled 3d6+2: [4, 2, 5] + 2 = 13"
     """
     # TODO: Implement dice rolling
-    pass
+    rolls = [random.randint(1, sides) for _ in range(n_dice)]
+    total = sum(rolls) + modifier
+    return f"Rolled {n_dice}d{sides}+{modifier}: {rolls} + {modifier} = {total}"
+
 
 
 def get_character_stat(character: str, stat: str) -> str:
@@ -77,7 +80,15 @@ def get_character_stat(character: str, stat: str) -> str:
     - Handle invalid character/stat names gracefully
     """
     # TODO: Implement character stat lookup
-    pass
+    character = character.lower()
+    stat = stat.lower() 
+    if character not in CHARACTERS:
+        return f"Unknown character: {character}"
+    if stat not in CHARACTERS[character]:
+        return f"Unknown stat: {stat} for character {character}"
+    value = CHARACTERS[character][stat]
+    return f"{character.capitalize()}'s {stat} is {value}"
+
 
 
 def calculate_damage(base_damage: int, armor_class: int, attack_roll: int) -> str:
@@ -90,7 +101,11 @@ def calculate_damage(base_damage: int, armor_class: int, attack_roll: int) -> st
     - Return a descriptive message
     """
     # TODO: Implement damage calculation
-    pass
+    if attack_roll >= armor_class:
+        return f"Attack hits! Dealt {base_damage} damage (attack roll: {attack_roll} vs AC: {armor_class})"
+    else:
+        return f"Attack misses! No damage dealt (attack roll: {attack_roll} vs AC: {armor_class})"
+    
 
 
 # =====================================================================
@@ -115,16 +130,19 @@ async def list_tools() -> list[Tool]:
     List all available DnD tools.
 
     TODO: Define three tools with their input schemas:
-
+    """
+    """
     1. roll_dice:
        - n_dice (int): Number of dice to roll
        - sides (int): Number of sides on each die
        - modifier (int, optional): Modifier to add to the roll (default 0)
-
+    """
+    """
     2. get_character_stat:
        - character (str): Character name (fighter, wizard, or rogue)
        - stat (str): Stat name (strength, dexterity, constitution, intelligence, wisdom, charisma)
-
+    """
+    """
     3. calculate_damage:
        - base_damage (int): Base damage amount
        - armor_class (int): Target's armor class
@@ -133,21 +151,46 @@ async def list_tools() -> list[Tool]:
     See demo/simple_mcp_server.py for the Tool schema format.
     """
     return [
-        # TODO: Define your tools here
-        # Example:
-        # Tool(
-        #     name="roll_dice",
-        #     description="Roll dice for DnD",
-        #     inputSchema={
-        #         "type": "object",
-        #         "properties": {
-        #             "n_dice": {"type": "integer", "description": "Number of dice"},
-        #             ...
-        #         },
-        #         "required": ["n_dice", "sides"]
-        #     }
-        # ),
+        Tool(
+            name="roll_dice",
+            description="Roll dice for DnD",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "n_dice": {"type": "string", "description": "Number of dice"},
+                    "sides": {"type": "string", "description": "Number of sides on each die"},
+                    "modifier": {"type": "string", "description": "Modifier to add to the roll"}
+                },
+                "required": ["n_dice", "sides"]
+            }
+        ),
+        Tool(
+            name="get_character_stat",  
+            description="Get a character's stat value",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "character": {"type": "string", "description": "Character name (fighter, wizard, rogue)"},
+                    "stat": {"type": "string", "description": "Stat name (strength, dexterity, constitution, intelligence, wisdom, charisma)"}
+                },
+                "required": ["character", "stat"]
+            }
+        ),
+        Tool(
+            name="calculate_damage",
+            description="Calculate damage dealt based on attack roll vs armor class",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "base_damage": {"type": "string", "description": "Base damage amount"},
+                    "armor_class": {"type": "string", "description": "Target's armor class"},
+                    "attack_roll": {"type": "string", "description": "The attack roll result"}
+                },
+                "required": ["base_damage", "armor_class", "attack_roll"]
+            }
+        )
     ]
+   
 
 
 @server.call_tool()
@@ -156,8 +199,26 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     func = TOOL_FUNCTIONS.get(name)
     if func is None:
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
+    
+    # Convert arguments to correct types
+    if name == "roll_dice":
+        arguments = {
+            "n_dice": int(arguments["n_dice"]),
+            "sides": int(arguments["sides"]),
+            "modifier": int(arguments.get("modifier") or "0")
+        }
+    elif name == "get_character_stat":
+        # strings are fine
+        pass
+    elif name == "calculate_damage":
+        arguments = {
+            "base_damage": int(arguments["base_damage"]),
+            "armor_class": int(arguments["armor_class"]),
+            "attack_roll": int(arguments["attack_roll"])
+        }
+    
     result = func(**arguments)
-    return [TextContent(type="text", text=result)]
+    return [TextContent(type="text", text=str(result))]
 
 
 async def main():

@@ -28,7 +28,7 @@ async def main():
     """Connect to the demo MCP server and demonstrate tool usage."""
 
     # Path to the demo server
-    server_script = Path(__file__).parent / "simple_mcp_server.py"
+    server_script = Path(__file__).parent.parent / "mcp_server.py"
 
     print("=" * 70)
     print("                    MCP Protocol Demo")
@@ -128,10 +128,10 @@ async def main():
             print(f"[OK] Found {len(tools_result.tools)} tools!")
 
             # =========================================================
-            # STEP 3: Call a tool - get_current_time
+            # STEP 3: Call a tool - roll_dice
             # =========================================================
             print("\n" + "#" * 70)
-            print("# STEP 3: Call Tool - get_current_time")
+            print("# STEP 3: Call Tool - roll_dice")
             print("#" * 70)
 
             print_message(
@@ -141,13 +141,13 @@ async def main():
                     "jsonrpc": "2.0",
                     "method": "tools/call",
                     "params": {
-                        "name": "get_current_time",
-                        "arguments": {}
+                        "name": "roll_dice",
+                        "arguments": {"n_dice": 2, "sides": 6, "modifier": 3}
                     }
                 }
             )
 
-            result = await session.call_tool("get_current_time", {})
+            result = await session.call_tool("roll_dice", {"n_dice": 2, "sides": 6, "modifier": 3})
 
             print_message(
                 "SERVER -> CLIENT",
@@ -163,10 +163,10 @@ async def main():
             print(f"[OK] Tool result: {result.content[0].text}")
 
             # =========================================================
-            # STEP 4: Call a tool with arguments - add_numbers
+            # STEP 4: Call a tool with arguments - get_character_stat
             # =========================================================
             print("\n" + "#" * 70)
-            print("# STEP 4: Call Tool with Arguments - add_numbers(5, 3)")
+            print("# STEP 4: Call Tool with Arguments - get_character_stat")
             print("#" * 70)
 
             print_message(
@@ -176,13 +176,13 @@ async def main():
                     "jsonrpc": "2.0",
                     "method": "tools/call",
                     "params": {
-                        "name": "add_numbers",
-                        "arguments": {"a": 5, "b": 3}
+                        "name": "get_character_stat",
+                        "arguments": {"character": "fighter", "stat": "strength"}
                     }
                 }
             )
 
-            result = await session.call_tool("add_numbers", {"a": 5, "b": 3})
+            result = await session.call_tool("get_character_stat", {"character": "fighter", "stat": "strength"})
 
             print_message(
                 "SERVER -> CLIENT",
